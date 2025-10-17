@@ -6,26 +6,28 @@
   <link rel="stylesheet" href="https://unpkg.com/swagger-ui-dist/swagger-ui.css">
   <style>
     body { margin: 0; }
-    #topbar { display:none; } /* oculta barra extra */
+   /* #topbar { display:none; }  oculta barra extra */
   </style>
 </head>
 <body>
   <div id="swagger-ui"></div>
 
-  <script src="https://unpkg.com/swagger-ui-dist/swagger-ui-bundle.js"></script>
-  <script>
-    // 👉 Cambiá la URL según qué spec quieras ver por defecto
-    const DEFAULT_SPEC = 'docs/apis/pagos.json';
+<script src="https://unpkg.com/swagger-ui-dist/swagger-ui-bundle.js"></script>
+<script>
+  // 👉 Lista de specs disponibles
+  const URLS = [
+    { url: 'docs/apis/plusPagoApi.json',   name: 'Pagos API' },
+    { url: 'docs/apis/microservicioCliente.json', name: 'Cliente API' }
+  ];
 
-    window.ui = SwaggerUIBundle({
-      url: DEFAULT_SPEC,
-      dom_id: '#swagger-ui',
-      deepLinking: true,
-      tryItOutEnabled: true, // botón "Try it out"
-      presets: [
-        SwaggerUIBundle.presets.apis
-      ],
-    });
-  </script>
+  window.ui = SwaggerUIBundle({
+    // Usamos 'urls' en lugar de 'url' para habilitar el selector
+    urls: URLS,
+    dom_id: '#swagger-ui',
+    deepLinking: true,
+    tryItOutEnabled: true
+  });
+</script>
+
 </body>
 </html>
