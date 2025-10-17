@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8"/>
+  <title>PlusPagos Dev Portal (Docs)</title>
+  <script src="https://cdn.redoc.ly/redoc/latest/bundles/redoc.standalone.js"></script>
+  <style>
+    body { margin:0; font-family: system-ui, sans-serif; }
+    .sidebar { position:fixed; top:0; bottom:0; width:280px; padding:16px; border-right:1px solid #eee; overflow:auto; }
+    .content { margin-left:280px; height:100vh; }
+    a { display:block; margin:6px 0; text-decoration:none; color:#0366d6; }
+    h2 { margin-top:0 }
+    .small { color:#666; font-size:12px; }
+  </style>
+</head>
+<body>
+  <div class="sidebar">
+    <h2>APIs</h2>
+    <a href="#/docs/pagos">Pagos API</a>
+    <a href="#/docs/cliente">Cliente API</a>
+    <hr>
+    <a href="docs/overview.md">Overview / Arquitectura (MD)</a>
+    <span class="small">v0 — ReDoc estático</span>
+  </div>
+
+  <div id="redoc-container" class="content"></div>
+
+  <script>
+    const routes = {
+      '#/docs/pagos': 'docs/apis/pagos.json',
+      '#/docs/cliente': 'docs/apis/cliente.json'
+    };
+    function render() {
+      const spec = routes[location.hash] || routes['#/docs/pagos'];
+      Redoc.init(spec, { hideDownloadButton: false, expandResponses: "200,201" }, document.getElementById('redoc-container'));
+    }
+    window.addEventListener('hashchange', render);
+    render();
+  </script>
+</body>
+</html>
