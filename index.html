@@ -4,10 +4,13 @@
   <meta charset="utf-8"/>
   <title>PlusPagos Dev Portal (Docs)</title>
   <script src="https://cdn.redoc.ly/redoc/latest/bundles/redoc.standalone.js"></script>
+  <!-- Markdown renderer + sanitizer -->
+  <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/dompurify@3.1.7/dist/purify.min.js"></script>
   <style>
     body { margin:0; font-family: system-ui, sans-serif; }
     .sidebar { position:fixed; top:0; bottom:0; width:280px; padding:16px; border-right:1px solid #eee; overflow:auto; }
-    .content { margin-left:280px; height:100vh; }
+    .content { margin-left:280px; height:100vh; overflow:auto; padding:16px; }
     a { display:block; margin:6px 0; text-decoration:none; color:#0366d6; }
     h2 { margin-top:0 }
     .small { color:#666; font-size:12px; }
@@ -19,21 +22,43 @@
     <a href="#/docs/pagos">Pagos API</a>
     <a href="#/docs/cliente">Cliente API</a>
     <hr>
-    <a href="docs/overview.md">Overview / Arquitectura (MD)</a>
-    <span class="small">v0 — ReDoc estático</span>
+    <!-- NUEVO: link que renderiza el Markdown embebido -->
+    <a href="#/page/overview">Overview / Arquitectura</a>
+    <span class="small">v0 — ReDoc estático + MD render</span>
   </div>
 
-  <div id="redoc-container" class="content"></div>
+  <!-- Un solo contenedor donde metemos Redoc o Markdown -->
+  <div id="content" class="content"></div>
 
   <script>
     const routes = {
-      '#/docs/pagos': 'docs/apis/plusPagoApi.json',
-      '#/docs/cliente': 'docs/apis/microservicioCliente.json'
+      '#/docs/pagos':   { type: 'redoc', spec: 'docs/apis/pagos.json' },
+      '#/docs/cliente': { type: 'redoc', spec: 'docs/apis/cliente.json' },
+      '#/page/overview':{ type: 'md',    file:'docs/overview.md' }
     };
-    function render() {
-      const spec = routes[location.hash] || routes['#/docs/pagos'];
-      Redoc.init(spec, { hideDownloadButton: false, expandResponses: "200,201" }, document.getElementById('redoc-container'));
+
+    async function render() {
+      const route = routes[location.hash] || routes['#/docs/pagos'];
+      const el = document.getElementById('content');
+      el.innerHTML = ''; // limpiar
+
+      if (route.type === 'redoc') {
+        // Render OpenAPI
+        Redoc.init(route.spec, { hideDownloadButton: false, expandResponses: "200,201" }, el);
+      } else if (route.type === 'md') {
+        // Render Markdown
+        try {
+          const res = await fetch(route.file);
+          if (!res.ok) throw new Error('No se pudo cargar el Markdown');
+          const md = await res.text();
+          const html = DOMPurify.sanitize(marked.parse(md));
+          el.innerHTML = html;
+        } catch (e) {
+          el.innerHTML = '<p style="color:#b00">Error cargando Markdown.</p>';
+        }
+      }
     }
+
     window.addEventListener('hashchange', render);
     render();
   </script>
